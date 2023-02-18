@@ -38,6 +38,12 @@ const App = () => {
     //setTodos를 업데이트 한다.
     setTodos([...todos, inputTitle]);
   };
+
+  const onDeleteHanlder = async (id) => {
+    axios.delete(`http://localhost:4001/todos/${id}`);
+    setTodos(todos.filter((item) => item.id !== id));
+  };
+
   return (
     <>
       <div>
@@ -50,6 +56,7 @@ const App = () => {
         {todos?.map((item) => (
           <div>
             <p key={item.id}>{`${item.id}: ${item.title}`}</p>
+            <button onClick={() => onDeleteHanlder(item.id)}>삭제</button>
           </div>
         ))}
       </div>
