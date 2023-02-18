@@ -9,6 +9,11 @@ const App = () => {
     title: '',
   });
 
+  const [edit, setEdit] = useState({
+    id: '',
+    content: '',
+  });
+
   // 1. axios를 통해서 get 요청을 하는 함수를 생성
   // 비동기처리를 해야하므로 async/await 구문을 통해서 처리합
   const fetchTodos = async () => {
@@ -33,10 +38,14 @@ const App = () => {
   //5. onSubmitHandler
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    //버튼 클릭시 INPUT값을 DB에 추가(POST)
-    axios.post('http://localhost:4001/todos', inputTitle);
-    //setTodos를 업데이트 한다.
-    setTodos([...todos, inputTitle]);
+    if (inputTitle.title !== '') {
+      // 버튼 클릭시 INPUT값을 DB에 추가(POST)
+      await axios.post('http://localhost:4001/todos', inputTitle);
+      // setTodos를 업데이트 한다.
+      await fetchTodos();
+      // input을 빈값으로 초기화
+      setInputTitle({ title: '' });
+    }
   };
 
   //6. onDeleteHandler
@@ -44,9 +53,51 @@ const App = () => {
     axios.delete(`http://localhost:4001/todos/${id}`);
     setTodos(todos.filter((item) => item.id !== id));
   };
+  //7. onChangeEditHander
+  const onChangeEditHander = (e) => {
+    const { name, value } = e.target;
+    setEdit({ ...edit, [name]: value });
+  };
+
+  //8. onEditHandler
+  const onEditHandler = async () => {
+    // axios를 사용하여 데이터 업데이트
+    await axios.patch(`http://localhost:4001/todos/${edit.id}`, {
+      title: edit.content,
+    });
+
+    // todos 상태를 업데이트하여 화면을 다시 그림
+    setTodos(
+      todos.map((item) => {
+        if (item.id === edit.id) {
+          return { ...item, title: edit.content };
+        } else {
+          return item;
+        }
+      })
+    );
+
+    // edit 상태를 초기화하여 화면을 리렌더링
+    setEdit({ id: '', content: '' });
+  };
 
   return (
     <>
+      <div>
+        <input
+          name="id"
+          value={edit.id}
+          onChange={onChangeEditHander}
+          placeholder="수정할 아이디"
+        />
+        <input
+          name="content"
+          value={edit.content}
+          onChange={onChangeEditHander}
+          placeholder="수정할 내용"
+        />
+        <button onClick={onEditHandler}>수정</button>
+      </div>
       <div>
         <form onSubmit={onSubmitHandler}>
           <input value={inputTitle.title} onChange={onChangesHandler} />
