@@ -39,6 +39,7 @@ const App = () => {
     setTodos([...todos, inputTitle]);
   };
 
+  //6. onDeleteHandler
   const onDeleteHanlder = async (id) => {
     axios.delete(`http://localhost:4001/todos/${id}`);
     setTodos(todos.filter((item) => item.id !== id));
