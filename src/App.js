@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios'; // axios import
+import api from './axios/api';
 
 const App = () => {
   const [todos, setTodos] = useState(null);
@@ -15,9 +16,9 @@ const App = () => {
   });
 
   // 1. axios를 통해서 get 요청을 하는 함수를 생성
-  // 비동기처리를 해야하므로 async/await 구문을 통해서 처리합
+  // 비동기처리를 해야하므로 async/await 구문을 통해서 처리함
   const fetchTodos = async () => {
-    const { data } = await axios.get('http://localhost:4001/todos');
+    const { data } = await api.get('/todos');
     setTodos(data); // 서버로부터 fetching한 데이터를 useState의 state로 set.
   };
 
@@ -40,7 +41,7 @@ const App = () => {
     e.preventDefault();
     if (inputTitle.title !== '') {
       // 버튼 클릭시 INPUT값을 DB에 추가(POST)
-      await axios.post('http://localhost:4001/todos', inputTitle);
+      await api.post('/todos', inputTitle);
       // setTodos를 업데이트 한다.
       await fetchTodos();
       // input을 빈값으로 초기화
@@ -50,7 +51,7 @@ const App = () => {
 
   //6. onDeleteHandler
   const onDeleteHanlder = async (id) => {
-    axios.delete(`http://localhost:4001/todos/${id}`);
+    api.delete(`/todos/${id}`);
     setTodos(todos.filter((item) => item.id !== id));
   };
   //7. onChangeEditHander
@@ -62,7 +63,7 @@ const App = () => {
   //8. onEditHandler
   const onEditHandler = async () => {
     // axios를 사용하여 데이터 업데이트
-    await axios.patch(`http://localhost:4001/todos/${edit.id}`, {
+    await api.patch(`/todos/${edit.id}`, {
       title: edit.content,
     });
 
